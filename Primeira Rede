@@ -1,0 +1,36 @@
+import matplotlib.pyplot as plt
+from tensorflow import keras
+import numpy as np
+
+(x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+
+side = 5
+start = np.random.random_integers(low=0, high=x_train.shape[0], size=(1,))[0]
+fig, ax = plt.subplots(side, side)
+for a in range(side):
+    for b in range(side):
+        ax[a, b].axes.xaxis.set_visible(False)
+        ax[a, b].axes.yaxis.set_visible(False)
+        ax[a, b].imshow(x_train[2 * a + b + start, :, :], cmap='gray')
+plt.show()
+
+#normalização
+x_train_norm = x_train / 255.0 
+x_test_norm =  x_test / 255.0 
+
+y_train = keras.utils.to_categorical(y_train)
+y_test = keras.utils.to_categorical(y_test)
+
+#criação de modelo
+model = keras.Sequential([
+  keras.layers.Flatten(input_shape=(28, 28)),
+  keras.layers.Dense(200, activation='relu'),
+  keras.layers.Dense(10, activation='sigmoid')
+])
+
+#copilando modelo
+model.compile(loss='categorical_crossentropy',
+             optimizer ='sgd', 
+             metrics=['accuracy'])
+#treinando             
+model.fit(x_train_norm, y_train, validation_data=(x_test_norm, y_test), epochs=30)             
